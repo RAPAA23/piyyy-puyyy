@@ -1,0 +1,57 @@
+<!DOCTYPE html>
+<html lang="id">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>piy puy</title>
+    <link href="https://fonts.googleapis.com/css2?family=Gaegu:wght@300;400;700&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="style.css">
+</head>
+<body>
+<div class="page">
+    <div class="header">
+        <div class="month-nav-row">
+            <button class="nav-btn" id="prev-btn">&#8249;</button>
+            <div class="month-title" id="month-title">JUNE 2026</div>
+            <button class="nav-btn" id="next-btn">&#8250;</button>
+        </div>
+    </div>
+
+    <div class="mascot-area">
+        <img src="piypuy.png" alt="Piypuy" class="mascot-img">
+    </div>
+
+    <div class="calendar-wrapper">
+        <div class="day-headers">
+            <div class="day-header">S</div>
+            <div class="day-header">M</div>
+            <div class="day-header">T</div>
+            <div class="day-header">W</div>
+            <div class="day-header">T</div>
+            <div class="day-header">F</div>
+            <div class="day-header">S</div>
+        </div>
+        <div class="calendar-grid" id="calendar-grid"></div>
+    </div>
+
+    <div class="dot-nav">
+        <div class="dot"></div>
+        <div class="dot active"></div>
+        <div class="dot"></div>
+    </div>
+
+    <div class="event-section">
+        <div class="selected-date-label" id="selected-label">📌 pilih tanggal dulu ya~</div>
+        <div class="event-input-row">
+            <input class="event-input" type="text" id="event-input" placeholder="tambahin jadwal... 🐾" maxlength="60">
+            <button class="add-btn" id="add-btn">+ add</button>
+        </div>
+        <ul class="events-list" id="events-list">
+            <li class="no-events">klik tanggal buat lihat/tambah jadwal ✨</li>
+        </ul>
+    </div>
+</div>
+
+<script src="script.js"></script>
+</body>
+</html>

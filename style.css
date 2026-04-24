@@ -1,0 +1,305 @@
+* {
+    margin: 0;
+    padding: 0;
+    box-sizing: border-box;
+}
+
+:root {
+    --cream: #faf9f6;
+    --off-white: #f5f3ee;
+    --ink: #1a1a1a;
+    --ink-light: #3a3a3a;
+    --orange: #c8622a;
+    --orange-light: #e07840;
+    --gray: #888;
+    --gray-light: #ccc;
+    --border: #ddd;
+}
+
+body {
+    font-family: 'Gaegu', cursive;
+    background: var(--cream);
+    min-height: 100vh;
+    display: flex;
+    align-items: flex-start;
+    justify-content: center;
+    padding: 20px;
+}
+
+.page {
+    background: white;
+    width: 100%;
+    max-width: 420px;
+    min-height: 100vh;
+    border-radius: 20px;
+    box-shadow: 0 4px 30px rgba(0,0,0,0.08);
+    overflow: hidden;
+    display: flex;
+    flex-direction: column;
+}
+
+/* HEADER */
+.header {
+    padding: 30px 30px 20px;
+    text-align: center;
+    border-bottom: 2px dashed var(--border);
+}
+
+.month-nav-row {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    gap: 20px;
+    margin-bottom: 10px;
+}
+
+.nav-btn {
+    background: none;
+    border: 2.5px solid var(--ink);
+    border-radius: 50%;
+    width: 36px;
+    height: 36px;
+    font-size: 1em;
+    cursor: pointer;
+    font-family: 'Gaegu', cursive;
+    transition: all 0.2s;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    color: var(--ink);
+}
+
+.nav-btn:hover {
+    background: var(--ink);
+    color: white;
+}
+
+.month-title {
+    font-family: 'Gaegu', cursive;
+    font-weight: 700;
+    font-size: 1.8em;
+    letter-spacing: 0.15em;
+    color: var(--ink);
+    text-transform: uppercase;
+}
+
+/* MASCOT */
+.mascot-area {
+    padding: 20px 30px 10px;
+    display: flex;
+    justify-content: center;
+}
+
+.mascot-img {
+    width: 160px;
+    height: auto;
+}
+
+/* CALENDAR */
+.calendar-wrapper {
+    padding: 10px 20px 20px;
+    flex: 1;
+}
+
+.day-headers {
+    display: grid;
+    grid-template-columns: repeat(7, 1fr);
+    margin-bottom: 8px;
+}
+
+.day-header {
+    text-align: center;
+    font-family: 'Gaegu', cursive;
+    font-weight: 700;
+    font-size: 1.05em;
+    color: var(--ink);
+    padding: 6px 2px;
+    letter-spacing: 0.05em;
+}
+
+.calendar-grid {
+    display: grid;
+    grid-template-columns: repeat(7, 1fr);
+    gap: 4px;
+}
+
+.cal-day {
+    aspect-ratio: 1;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+    cursor: pointer;
+    border-radius: 50%;
+    font-family: 'Gaegu', cursive;
+    font-size: 1.2em;
+    font-weight: 700;
+    color: var(--ink);
+    transition: all 0.2s;
+    position: relative;
+}
+
+.cal-day:hover {
+    background: var(--off-white);
+}
+
+.cal-day.other-month {
+    color: var(--gray-light);
+}
+
+.cal-day.today {
+    background: var(--ink);
+    color: white;
+    border-radius: 50%;
+}
+
+.cal-day.selected {
+    background: var(--orange);
+    color: white;
+    border-radius: 50%;
+}
+
+.cal-day.has-event::after {
+    content: '';
+    position: absolute;
+    bottom: 3px;
+    width: 5px;
+    height: 5px;
+    background: var(--orange);
+    border-radius: 50%;
+}
+
+.cal-day.selected.has-event::after {
+    background: white;
+}
+
+.cal-day.today.has-event::after {
+    background: var(--orange);
+}
+
+/* EVENT SECTION */
+.event-section {
+    background: var(--off-white);
+    border-top: 2px dashed var(--border);
+    padding: 20px;
+}
+
+.selected-date-label {
+    font-family: 'Gaegu', cursive;
+    font-size: 1.1em;
+    font-weight: 700;
+    color: var(--ink);
+    margin-bottom: 12px;
+    text-align: center;
+}
+
+.event-input-row {
+    display: flex;
+    gap: 8px;
+    margin-bottom: 12px;
+}
+
+.event-input {
+    flex: 1;
+    padding: 10px 14px;
+    border: 2px solid var(--ink);
+    border-radius: 12px;
+    font-family: 'Gaegu', cursive;
+    font-size: 1em;
+    background: white;
+    outline: none;
+}
+
+.event-input:focus {
+    border-color: var(--orange);
+}
+
+.add-btn {
+    background: var(--ink);
+    color: white;
+    border: none;
+    border-radius: 12px;
+    padding: 10px 16px;
+    font-family: 'Gaegu', cursive;
+    font-size: 1em;
+    cursor: pointer;
+    transition: background 0.2s;
+}
+
+.add-btn:hover {
+    background: var(--orange);
+}
+
+.events-list {
+    list-style: none;
+    max-height: 200px;
+    overflow-y: auto;
+}
+
+.event-item {
+    background: white;
+    border: 2px solid var(--border);
+    border-radius: 12px;
+    padding: 10px 14px;
+    margin-bottom: 8px;
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    font-family: 'Gaegu', cursive;
+    font-size: 1em;
+    animation: slideIn 0.2s ease;
+}
+
+@keyframes slideIn {
+    from { opacity: 0; transform: translateY(8px); }
+    to { opacity: 1; transform: translateY(0); }
+}
+
+.event-item .del-btn {
+    background: none;
+    border: none;
+    cursor: pointer;
+    font-size: 1em;
+    color: var(--gray);
+    padding: 2px 6px;
+    border-radius: 6px;
+    transition: color 0.2s;
+}
+
+.event-item .del-btn:hover {
+    color: var(--orange);
+}
+
+.no-events {
+    text-align: center;
+    color: var(--gray);
+    font-size: 1em;
+    padding: 16px;
+}
+
+/* FOOTER DOT NAV */
+.dot-nav {
+    display: flex;
+    justify-content: center;
+    gap: 8px;
+    padding: 12px;
+}
+
+.dot {
+    width: 8px;
+    height: 8px;
+    border-radius: 50%;
+    background: var(--border);
+}
+
+.dot.active {
+    background: var(--ink);
+}
+
+/* RESPONSIVE */
+@media (min-width: 600px) {
+    .page {
+        margin-top: 30px;
+        min-height: auto;
+    }
+}
