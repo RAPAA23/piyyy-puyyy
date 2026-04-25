@@ -112,14 +112,21 @@ function renderEvents() {
   }
 
   events[selectedDate].forEach(ev => {
-    const li = document.createElement('li');
-    li.className = 'event-item';
+  const li = document.createElement('li');
+  li.className = 'event-item';
 
-    li.innerHTML = `<span>${ev.text}</span><button class="del-btn">✕</button>`;
-    li.querySelector('.del-btn').addEventListener('click', () => deleteEvent(ev.id));
+  li.innerHTML = `
+    <div>
+      <strong>${ev.name}</strong><br>
+      <span>${ev.text}</span>
+    </div>
+    <button class="del-btn">✕</button>
+  `;
 
-    list.appendChild(li);
-  });
+  li.querySelector('.del-btn').addEventListener('click', () => deleteEvent(ev.id));
+
+  list.appendChild(li);
+});
 }
 
 // ================= ADD =================
@@ -129,16 +136,22 @@ async function addEvent() {
     return;
   }
 
-  const input = document.getElementById('event-input');
-  const text = input.value.trim();
-  if (!text) return;
+  const nameInput = document.getElementById('name-input');
+  const eventInput = document.getElementById('event-input');
+
+  const name = nameInput.value.trim();
+  const text = eventInput.value.trim();
+
+  if (!name || !text) return;
 
   await addDoc(colRef, {
     date: selectedDate,
-    text: text
+    text: text,
+    name: name
   });
 
-  input.value = '';
+  nameInput.value = '';
+  eventInput.value = '';
 }
 
 // ================= DELETE =================
