@@ -71,7 +71,11 @@ function makeCell(d, y, m, isOther) {
   const isToday = d === today.getDate() && nm === today.getMonth() && ny === today.getFullYear();
   if (isToday && !isOther) cell.classList.add('today');
 
-  const key = dateKey(ny, nm, d);
+  const key = dateKey(ny, nm, d); // ⬅️ pindahin ke atas sebelum dipake
+
+  console.log("KEY:", key);
+  console.log("SELECTED:", selectedDate);
+
   if (events[key] && events[key].length > 0) cell.classList.add('has-event');
   if (selectedDate === key) cell.classList.add('selected');
 
@@ -117,7 +121,7 @@ function renderEvents() {
 
   li.innerHTML = `
     <div>
-      <strong>${ev.name}</strong><br>
+      <strong>${ev.name || 'anon'}</strong>
       <span>${ev.text}</span>
     </div>
     <button class="del-btn">✕</button>
@@ -202,5 +206,5 @@ selectedDate = dateKey(
   today.getDate()
 );
 
+srenderCalendar();
 selectDate(selectedDate, today.getDate());
-renderCalendar();
