@@ -1,7 +1,6 @@
 import { initializeApp } from "https://www.gstatic.com/firebasejs/10.7.1/firebase-app.js";
 import { getFirestore, collection, addDoc, onSnapshot, deleteDoc, doc } from "https://www.gstatic.com/firebasejs/10.7.1/firebase-firestore.js";
 
-// 🔥 config firebase lu
 const firebaseConfig = {
   apiKey: "AIzaSyAKNoVyOwrbe9zmcmTgugFdCfchns6M4Xs",
   authDomain: "piyypuyy-dee99.firebaseapp.com",
@@ -15,7 +14,6 @@ const app = initializeApp(firebaseConfig);
 const db = getFirestore(app);
 const colRef = collection(db, "events");
 
-// ================= BASIC =================
 const MONTHS = ['JANUARY','FEBRUARY','MARCH','APRIL','MAY','JUNE','JULY','AUGUST','SEPTEMBER','OCTOBER','NOVEMBER','DECEMBER'];
 
 const today = new Date();
@@ -23,13 +21,12 @@ let viewYear = today.getFullYear();
 let viewMonth = today.getMonth();
 let selectedDate = null;
 let events = {};
+let isFirstLoad = true;
 
-// ================= DATE KEY =================
 function dateKey(y, m, d) {
   return `${y}-${String(m+1).padStart(2,'0')}-${String(d).padStart(2,'0')}`;
 }
 
-// ================= RENDER CALENDAR =================
 function renderCalendar() {
   document.getElementById('month-title').textContent = `${MONTHS[viewMonth]} ${viewYear}`;
   const grid = document.getElementById('calendar-grid');
@@ -37,75 +34,43 @@ function renderCalendar() {
 
   const firstDay = new Date(viewYear, viewMonth, 1).getDay();
   const daysInMonth = new Date(viewYear, viewMonth+1, 0).getDate();
-  const prevDays = new Date(viewYear, viewMonth, 0).getDate();
 
-  for (let i = firstDay - 1; i >= 0; i--) {
-    grid.appendChild(makeCell(prevDays - i, viewYear, viewMonth - 1, true));
+  for (let i = 0; i < firstDay; i++) {
+    const empty = document.createElement('div');
+    grid.appendChild(empty);
   }
 
   for (let d = 1; d <= daysInMonth; d++) {
-    grid.appendChild(makeCell(d, viewYear, viewMonth, false));
-  }
+    const cell = document.createElement('div');
+    const key = dateKey(viewYear, viewMonth, d);
 
-  const total = firstDay + daysInMonth;
-  const rows = Math.ceil(total / 7);
-  const remaining = rows * 7 - total;
+    cell.className = 'cal-day';
+    cell.textContent = d;
 
-  for (let d = 1; d <= remaining; d++) {
-    grid.appendChild(makeCell(d, viewYear, viewMonth + 1, true));
+    if (selectedDate === key) cell.classList.add('selected');
+    if (events[key]) cell.classList.add('has-event');
+
+    cell.onclick = () => selectDate(key, d);
+
+    grid.appendChild(cell);
   }
 }
 
-// ================= CELL =================
-function makeCell(d, y, m, isOther) {
-  let nm = m, ny = y;
-  if (nm < 0) { nm = 11; ny--; }
-  if (nm > 11) { nm = 0; ny++; }
-
-  const cell = document.createElement('div');
-  cell.className = 'cal-day';
-  cell.textContent = d;
-
-  if (isOther) cell.classList.add('other-month');
-
-  const isToday = d === today.getDate() && nm === today.getMonth() && ny === today.getFullYear();
-  if (isToday && !isOther) cell.classList.add('today');
-
-  const key = dateKey(ny, nm, d); // ⬅️ pindahin ke atas sebelum dipake
-
-  console.log("KEY:", key);
-  console.log("SELECTED:", selectedDate);
-
-  if (events[key] && events[key].length > 0) cell.classList.add('has-event');
-  if (selectedDate === key) cell.classList.add('selected');
-
-  if (!isOther) {
-    cell.addEventListener('click', () => selectDate(key, d));
-  }
-
-  return cell;
-}
-
-// ================= SELECT DATE =================
 function selectDate(key, d) {
   selectedDate = key;
 
   const [y, m] = key.split('-').map(Number);
   const dateObj = new Date(y, m-1, d);
 
-  document.getElementById('selected-label').textContent =
-    `📌 ${dateObj.toLocaleDateString('id-ID', {
-      weekday: 'long',
-      year: 'numeric',
-      month: 'long',
-      day: 'numeric'
-    })}`;
+  const label = document.getElementById('selected-label');
+  if (label) {
+    label.textContent = `📌 ${dateObj.toLocaleDateString('id-ID')}`;
+  }
 
   renderCalendar();
   renderEvents();
 }
 
-// ================= RENDER EVENTS =================
 function renderEvents() {
   const list = document.getElementById('events-list');
   list.innerHTML = '';
@@ -116,72 +81,61 @@ function renderEvents() {
   }
 
   events[selectedDate].forEach(ev => {
-  const li = document.createElement('li');
-  li.className = 'event-item';
+    const li = document.createElement('li');
+    li.className = 'event-item';
 
-  li.innerHTML = `
-    <div>
-      <strong>${ev.name || 'anon'}</strong>
-      <span>${ev.text}</span>
-    </div>
-    <button class="del-btn">✕</button>
-  `;
+    li.innerHTML = `
+      <div>
+        <strong>${ev.name || 'anon'}</strong><br>
+        <span>${ev.text}</span>
+      </div>
+      <button class="del-btn">✕</button>
+    `;
 
-  li.querySelector('.del-btn').addEventListener('click', () => deleteEvent(ev.id));
-
-  list.appendChild(li);
-});
-}
-
-// ================= ADD =================
-async function addEvent() {
-  if (!selectedDate) {
-    alert('pilih tanggal dulu ya!');
-    return;
-  }
-
-  const nameInput = document.getElementById('name-input');
-  const eventInput = document.getElementById('event-input');
-
-  const name = nameInput.value.trim();
-  const text = eventInput.value.trim();
-
-  if (!name || !text) return;
-
-  await addDoc(colRef, {
-    date: selectedDate,
-    text: text,
-    name: name
+    li.querySelector('.del-btn').onclick = () => deleteEvent(ev.id);
+    list.appendChild(li);
   });
-
-  nameInput.value = '';
-  eventInput.value = '';
 }
 
-// ================= DELETE =================
+async function addEvent() {
+  const name = document.getElementById('name-input').value.trim();
+  const text = document.getElementById('event-input').value.trim();
+
+  if (!selectedDate || !name || !text) return;
+
+  await addDoc(colRef, { date: selectedDate, text, name });
+
+  document.getElementById('name-input').value = '';
+  document.getElementById('event-input').value = '';
+}
+
 async function deleteEvent(id) {
   await deleteDoc(doc(db, "events", id));
 }
 
-// ================= REALTIME =================
-onSnapshot(colRef, (snapshot) => {
+// onSnapshot handle semua render — ga perlu manual renderCalendar() di bawah
+onSnapshot(colRef, snap => {
   events = {};
-
-  snapshot.forEach(docSnap => {
-    const data = docSnap.data();
-    if (!events[data.date]) events[data.date] = [];
-
-    events[data.date].push({
-      text: data.text,
-      id: docSnap.id
-    });
+  snap.forEach(docSnap => {
+    const d = docSnap.data();
+    if (!events[d.date]) events[d.date] = [];
+    events[d.date].push({ ...d, id: docSnap.id });
   });
 
+  if (isFirstLoad) {
+    // set tanggal hari ini pas pertama kali data masuk
+    selectedDate = dateKey(today.getFullYear(), today.getMonth(), today.getDate());
+    isFirstLoad = false;
+  }
+
   renderCalendar();
-  renderEvents();
+
+  if (selectedDate) {
+    const d = parseInt(selectedDate.split('-')[2]);
+    selectDate(selectedDate, d);
+  }
 });
 
-// ================= NAV =================
 document.getElementById('prev-btn').onclick = () => {
   viewMonth--;
   if (viewMonth < 0) { viewMonth = 11; viewYear--; }
@@ -195,16 +149,8 @@ document.getElementById('next-btn').onclick = () => {
 };
 
 document.getElementById('add-btn').onclick = addEvent;
-document.getElementById('event-input').addEventListener('keydown', e => {
-  if (e.key === 'Enter') addEvent();
-});
 
-// ================= INIT =================
-selectedDate = dateKey(
-  today.getFullYear(),
-  today.getMonth(),
-  today.getDate()
-);
-
-srenderCalendar();
+// render awal sebelum firebase balik biar ga blank dulu
+selectedDate = dateKey(today.getFullYear(), today.getMonth(), today.getDate());
+renderCalendar();
 selectDate(selectedDate, today.getDate());
