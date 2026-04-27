@@ -103,11 +103,28 @@ async function addEvent() {
 
   if (!selectedDate || !name || !text) return;
 
-  await addDoc(colRef, { date: selectedDate, text, name });
+  try {
+    // 1. Simpan ke Firebase Firestore
+    await addDoc(colRef, { date: selectedDate, text, name });
+
+    // 2. Munculin Notifikasi (Delay 5 detik sesuai settingan lo)
+    scheduleNotification(
+      "Jadwal Berhasil Disimpan! 🐾", 
+      `Halo ${name}, agenda "${text}" sudah masuk di kalender Kita.`
+    );
+
+    // 3. Kosongin Input
+    document.getElementById('name-input').value = '';
+    document.getElementById('event-input').value = '';
+    
+  } catch (e) {
+    console.error("Error nambah jadwal: ", e);
+    alert("Gagal simpan jadwal nih, coba cek koneksi!");
+  }
+}
 
   document.getElementById('name-input').value = '';
   document.getElementById('event-input').value = '';
-}
 
 async function deleteEvent(id) {
   await deleteDoc(doc(db, "events", id));
@@ -154,3 +171,36 @@ document.getElementById('add-btn').onclick = addEvent;
 selectedDate = dateKey(today.getFullYear(), today.getMonth(), today.getDate());
 renderCalendar();
 selectDate(selectedDate, today.getDate());
+
+// Import fungsi notifikasi (kalau lo pake sistem module)
+// Tapi biasanya di script.js biasa, kita panggil via global object:
+const { LocalNotifications } = Capacitor.Plugins;
+
+// 1. Fungsi buat minta izin (panggil ini pas aplikasi baru buka)
+async function requestNotificationPermission() {
+    const permission = await LocalNotifications.requestPermissions();
+    if (permission.display === 'granted') {
+        console.log("Izin notifikasi diberikan!");
+    }
+}
+
+// 2. Fungsi buat munculin notifikasi
+async function scheduleNotification(title, body) {
+    await LocalNotifications.schedule({
+        notifications: [
+            {
+                title: title,
+                body: body,
+                id: 1,
+                schedule: { at: new Date(Date.now() + 1000 * 5) }, // Muncul 5 detik lagi
+                sound: null,
+                attachments: null,
+                actionTypeId: "",
+                extra: null
+            }
+        ]
+    });
+}
+
+// Panggil izinnya pas web load
+requestNotificationPermission();
